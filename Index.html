@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bootstrap demo</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <style>
+    body {
+      font-family: 'Helvetica';
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <form id="add-item">
+          <div class="form-group mt-4">
+            <label for="input-field">Add a title!</label>
+            <input type="text" class="form-control" placeholder="Give a title" id="input-field">
+          </div>
+          <div class="form-group mt-4">
+            <label for="body-field">Add a body content</label>
+            <textarea class="form-control" placeholder="Type something" id="body-field"></textarea>
+          </div>
+          <div class="col float-end mt-4">
+            <button class="btn btn-primary" type="button" onclick="addItem()">Add</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="row mt-4" id="card-container">
+      <!-- Existing cards will be appended here -->
+    </div>
+  </div>
+  <script src="app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+  <script>
+    // Retrieve saved items from local storage
+    const savedItems = JSON.parse(localStorage.getItem('items')) || [];
+
+    // Function to add a new item
+    function addItem() {
+      const title = document.getElementById('input-field').value;
+      const body = document.getElementById('body-field').value;
+
+      // Check if title and body are not empty
+      if (title.trim() === '' || body.trim() === '') {
+        alert('Please enter both title and body!');
+        return;
+      }
+
+      // Create a new card
+      const cardContainer = document.getElementById('card-container');
+      const card = document.createElement('div');
+      card.className = 'col-md-12';
+      card.innerHTML = `
+        <div class="card mt-4">
+          <div class="card-header">
+            <h2>${title}</h2>
+          </div>
+          <div class="card-body">
+            <p>${body}</p>
+            <button class="btn btn-danger float-end" onclick="deleteItem(this)">Delete</button>
+          </div>
+        </div>
+      `;
+
+      // Append the card to the container
+      cardContainer.appendChild(card);
+
+      // Save the new item
+      savedItems.push({ title, body });
+      localStorage.setItem('items', JSON.stringify(savedItems));
+
+      // Clear the input fields
+      document.getElementById('input-field').value = '';
+      document.getElementById('body-field').value = '';
+    }
+
+    // Function to delete an item
+    function deleteItem(button) {
+      const card = button.closest('.card');
+      const index = Array.from(card.parentNode.children).indexOf(card);
+
+      // Remove the item from the saved items
+      savedItems.splice(index, 1);
+      localStorage.setItem('items', JSON.stringify(savedItems));
+
+      // Remove the card from the DOM
+      card.remove();
+    }
+
+    // Load existing items from local storage on page load
+    window.addEventListener('load', () => {
+      for (const item of savedItems) {
+        addItemToDOM(item.title, item.body);
+      }
+    });
+
+    // Helper function to add an item to the DOM
+    function addItemToDOM(title, body) {
+      const cardContainer = document.getElementById('card-container');
+      const card = document.createElement('div');
+      card.className = 'col-md-12';
+      card.innerHTML = `
+        <div class="card mt-4">
+          <div class="card-header">
+            <h2>${title}</h2>
+          </div>
+          <div class="card-body">
+            <p>${body}</p>
+            <button class="btn btn-danger float-end" onclick="deleteItem(this)">Delete</button>
+          </div>
+        </div>
+      `;
+      cardContainer.appendChild(card);
+    }
+  </script>
+</body>
+</html>
